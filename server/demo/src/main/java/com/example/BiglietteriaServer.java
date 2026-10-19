@@ -6,14 +6,12 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 
-// Server TCP che gestisce la vendita dei biglietti (porta 3000).
-// Ogni client connesso viene gestito da un thread dedicato (ClientHandler).
+
 public class BiglietteriaServer {
 
     public static final int PORTA = 3000;
 
-    // Struttura dati condivisa: tipologia -> quantita' rimanente
-    // protected from outside access; accessed only via synchronized methods
+
     private static Map<String, Integer> disponibilita = new HashMap<>();
 
     static {
@@ -37,9 +35,7 @@ public class BiglietteriaServer {
         }
     }
 
-    // --- metodi synchronized per accedere in sicurezza alla mappa condivisa ---
-
-    // Restituisce la riga di riepilogo "AVAIL Gold:.. Pit:.. Parterre:.."
+   
     public static synchronized String getDisponibilita() {
         StringBuilder sb = new StringBuilder("AVAIL");
         for (Map.Entry<String, Integer> e : disponibilita.entrySet()) {
@@ -48,7 +44,7 @@ public class BiglietteriaServer {
         return sb.toString();
     }
 
-    // Tenta un acquisto. Ritorna true se riuscito, false altrimenti.
+    
     public static synchronized boolean acquista(String tipo, int quantita) {
         Integer disponibile = disponibilita.get(tipo);
         if (disponibile == null || quantita <= 0 || disponibile < quantita) {
@@ -58,7 +54,7 @@ public class BiglietteriaServer {
         return true;
     }
 
-    // Controlla se il tipo esiste (Gold, Pit, Parterre)
+   
     public static synchronized boolean tipoValido(String tipo) {
         return disponibilita.containsKey(tipo);
     }

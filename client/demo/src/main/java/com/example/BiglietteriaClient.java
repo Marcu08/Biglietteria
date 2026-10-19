@@ -7,7 +7,6 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
 
-// Client testuale: mostra un menu e parla col server usando il protocollo.
 public class BiglietteriaClient {
 
     public static void main(String[] args) {
@@ -17,10 +16,8 @@ public class BiglietteriaClient {
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
-            // all'avvio il server manda WELCOME
             System.out.println(in.readLine());
 
-            // LOGIN: chiedo il nome finche' il server non dice OK
             boolean loginOk = false;
             while (!loginOk) {
                 System.out.print("Username: ");
@@ -32,7 +29,6 @@ public class BiglietteriaClient {
                 }
             }
 
-            // menu principale
             boolean connesso = true;
             while (connesso) {
                 System.out.println();
