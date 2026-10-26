@@ -13,6 +13,16 @@ public class Main {
         BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
         PrintWriter out = new PrintWriter(s.getOutputStream(), true);
         
+        System.out.println("Server dice: " + in.readLine());
         
+        out.println("LOGIN");
+        System.out.println("Server dice: " + in.readLine()); 
+        out.println("StudenteTest");
+        System.out.println("Server dice: " + in.readLine()); 
+        
+        out.println("N");
+        System.out.println("Biglietti disponibili: " + in.readLine());
+        out.println("QUIT");
+        System.out.println("Server dice: " + in.readLine());         
     }
 }

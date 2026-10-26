@@ -12,18 +12,27 @@ public class BiglietteriaClient {
     public static void main(String[] args) {
         Scanner tastiera = new Scanner(System.in);
 
-        try {
-            Socket socket = new Socket("localhost", 3000);
+        try (Socket socket = new Socket("localhost", 3000)) {
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+            
+            
             System.out.println(in.readLine());
 
             boolean loginOk = false;
+            String risposta; 
+
             while (!loginOk) {
-                System.out.print("Username: ");
-                out.println("LOGIN " + tastiera.nextLine());
-                String risposta = in.readLine();
-                System.out.println(risposta);
+                out.println("LOGIN");
+                
+                System.out.println(in.readLine()); 
+                
+                out.println(tastiera.nextLine());
+                
+                
+                risposta = in.readLine();
+                System.out.println("Risposta server: " + risposta);
+                
                 if (risposta.equals("OK")) {
                     loginOk = true;
                 }
@@ -42,23 +51,27 @@ public class BiglietteriaClient {
                 switch (scelta) {
                     case "1":
                         out.println("N");
-                        System.out.println(in.readLine());
+                        System.out.println(in.readLine()); 
                         break;
 
                     case "2":
+                        
                         out.println("BUY");
-                        System.out.print("Tipo (Gold/Pit/Parterre): ");
+                        System.out.println(in.readLine());
                         String tipo = tastiera.nextLine().trim();
-                        System.out.print("Quantita': ");
+                        out.println(tipo); 
+                        
+                        
+                        System.out.println(in.readLine());
                         String quantita = tastiera.nextLine().trim();
-                        out.println(tipo + " " + quantita);
-                        String risposta = in.readLine();
+                        out.println(quantita);                         
+                        risposta = in.readLine();
                         System.out.println(risposta);
                         break;
 
                     case "3":
                         out.println("QUIT");
-                        System.out.println(in.readLine());
+                        System.out.println(in.readLine()); 
                         connesso = false;
                         break;
 
