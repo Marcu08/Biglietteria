@@ -8,17 +8,22 @@ import java.net.Socket;
 
 public class ClientHandler extends Thread {
     private Socket mioSocket;
+    private BiglietteriaServer server;
     private BufferedReader in;
     private PrintWriter out;
     private String username = null;
 
-    
+    public ClientHandler(Socket socket, BiglietteriaServer server) {
+        this.mioSocket = socket;
+        this.server = server;
+    }
 
     @Override
     public void run() {
         try {
             BufferedReader in = new BufferedReader(new InputStreamReader(mioSocket.getInputStream()));
             PrintWriter out = new PrintWriter(mioSocket.getOutputStream(), true);
+
             out.println("Benvenuto nella biglietteria");
 
             boolean continua = true;
@@ -34,28 +39,28 @@ public class ClientHandler extends Thread {
             System.out.println("Errore con un client: " + e.getMessage());
         } finally {
             try {
-                socket.close();
+                mioSocket.close();
             } catch (IOException e) {
-                // niente, il socket era gia' chiuso
+                
             }
             System.out.println("Connessione chiusa");
         }
     }
 
-    
-    private boolean gestisciComando(String linea) {
-        String[] parti = linea.split(" ", 2);
-        String comando = parti[0].toUpperCase();
+    private boolean gestisciComando(String comando) {
+        
+        comando = comando.toUpperCase();
 
         switch (comando) {
 
             case "LOGIN":
-                if (parti.length < 2 || parti[1].isEmpty()) {
-                    out.println("ERR SYNTAX");
-                } else {
-                    username = parti[1];
-                    System.out.println("Login: " + username);
+                try {
+                    out.println("Inserisci il tuo username:");
+                    username = in.readLine();
+                    System.out.println("Login effettuato da: " + username);
                     out.println("OK");
+                } catch (IOException e) {
+                    out.println("ERR LOGIN");
                 }
                 break;
 
@@ -63,7 +68,8 @@ public class ClientHandler extends Thread {
                 if (username == null) {
                     out.println("ERR LOGINREQUIRED");
                 } else {
-                    out.println(BiglietteriaServer.getDisponibilita());
+                    System.out.println("Richiesta di disponibilita' da parte di: " + username);
+                    out.println(server.getDisponibilita());
                 }
                 break;
 
@@ -72,38 +78,35 @@ public class ClientHandler extends Thread {
                     out.println("ERR LOGINREQUIRED");
                     break;
                 }
+                
                 try {
-                    String richiesta = in.readLine();
-                    String[] dati = richiesta.trim().split(" ", 2);
+                    
+                    out.println("Inserisci il tipo di biglietto (Gold/Pit/Parterre):");
+                    String tipo = in.readLine();
+                    
+                    out.println("Inserisci la quantita':");
+                    int quantita = Integer.parseInt(in.readLine());
 
-                    if (dati.length < 2) {
-                        out.println("ERR SYNTAX");
-                        break;
-                    }
-
-                    String tipo = dati[0];
-                    int quantita = Integer.parseInt(dati[1]);
-
-                    if (!BiglietteriaServer.tipoValido(tipo)) {
+                    
+                    if (!server.tipoValido(tipo)) {
                         out.println("ERR UNKNOWNTYPE");
-                    } else if (BiglietteriaServer.acquista(tipo, quantita)) {
-                        out.println("OK");
+                    } else if (server.acquista(tipo, quantita)) {
+                        out.println("OK - Acquisto riuscito!");
                     } else {
-                        out.println("KO");
+                        out.println("KO - Biglietti insufficienti o input errato");
                     }
-                } catch (NumberFormatException ex) {
+                } catch (IOException | NumberFormatException ex) {
                     out.println("ERR SYNTAX");
                 }
-            break;
+                break;
 
             case "QUIT":
                 out.println("BYE");
-                return false;
+                return false; 
 
             default:
-                out.println("ERR UNKNOWNCMD");
+                out.println("ERR COMANDO NON VALIDO. Comandi validi: LOGIN, N, BUY, QUIT");
         }
 
-        return true;
-    }
+        return true;     }
 }
