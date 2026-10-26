@@ -9,26 +9,26 @@ import java.util.Map;
 
 public class BiglietteriaServer {
 
-    public static final int PORTA = 3000;
+    private Map<String, Integer> disponibilita = new HashMap<>();
 
-
-    private static Map<String, Integer> disponibilita = new HashMap<>();
-
-    static {
-        disponibilita.put("Gold", 10);
-        disponibilita.put("Pit", 30);
-        disponibilita.put("Parterre", 60);
+    
+    public BiglietteriaServer() {
+        disponibilita.put("Gold", 100);
+        disponibilita.put("Pit", 200);
+        disponibilita.put("Parterre", 300);
     }
 
     public static void main(String[] args) {
-        try (ServerSocket server = new ServerSocket(PORTA)) {
-            System.out.println("Server avviato sulla porta " + PORTA);
+
+        
+        try (ServerSocket server = new ServerSocket(3000)) {
+            System.out.println("Server avviato sulla porta " + 3000);
 
             while (true) {
                 Socket socket = server.accept();
                 System.out.println("Nuova connessione da: " + socket.getRemoteSocketAddress());
                 // un thread per ogni client
-                new ClientHandler(socket).start();
+                new ClientHandler().start();
             }
         } catch (IOException e) {
             System.out.println("Errore del server: " + e.getMessage());
@@ -36,16 +36,19 @@ public class BiglietteriaServer {
     }
 
    
-    public static synchronized String getDisponibilita() {
-        StringBuilder sb = new StringBuilder("AVAIL");
-        for (Map.Entry<String, Integer> e : disponibilita.entrySet()) {
-            sb.append(" ").append(e.getKey()).append(":").append(e.getValue());
+    public synchronized String getDisponibilita() {
+        String risultato = "AVAIL";
+        for (String tipo : disponibilita.keySet()) {
+        int quantita = disponibilita.get(tipo);
+        
+        risultato = risultato + " " + tipo + ":" + quantita;
         }
-        return sb.toString();
+    
+        return risultato;
     }
 
     
-    public static synchronized boolean acquista(String tipo, int quantita) {
+    public synchronized boolean acquista(String tipo, int quantita) {
         Integer disponibile = disponibilita.get(tipo);
         if (disponibile == null || quantita <= 0 || disponibile < quantita) {
             return false;
@@ -55,7 +58,7 @@ public class BiglietteriaServer {
     }
 
    
-    public static synchronized boolean tipoValido(String tipo) {
+    public synchronized boolean tipoValido(String tipo) {
         return disponibilita.containsKey(tipo);
     }
 }

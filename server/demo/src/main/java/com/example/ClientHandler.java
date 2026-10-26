@@ -7,23 +7,19 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 public class ClientHandler extends Thread {
-
-    private Socket socket;
+    private Socket mioSocket;
     private BufferedReader in;
     private PrintWriter out;
     private String username = null;
 
-    public ClientHandler(Socket socket) {
-        this.socket = socket;
-    }
+    
 
     @Override
     public void run() {
         try {
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            out = new PrintWriter(socket.getOutputStream(), true);
-
-            out.println("WELCOME");
+            BufferedReader in = new BufferedReader(new InputStreamReader(mioSocket.getInputStream()));
+            PrintWriter out = new PrintWriter(mioSocket.getOutputStream(), true);
+            out.println("Benvenuto nella biglietteria");
 
             boolean continua = true;
             while (continua) {
